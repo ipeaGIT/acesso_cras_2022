@@ -6,10 +6,10 @@ library(viridis)
 library(tidyr)
 library(ggspatial)
 library(readr)
-#devtools::install_git("https://gitlab.ipea.gov.br/rafael.pereira/ipeadatalake")
+# devtools::install_git("https://gitlab.ipea.gov.br/rafael.pereira/ipeadatalake")
 library(ipeadatalake)
 
-########## Carregar dados do AOP de população e acesso ##########
+########## Carregar dados do AOP de populacao e acesso ##########
 
 
 
@@ -161,5 +161,5 @@ ggplot(resumo_long_60, aes(x = reorder(name_muni, -Percentual), y = Percentual, 
 
 ######## CadÚnico #####
 
-bh_cad_unico <- read_cadunico(geocode = TRUE, type )
+bh_cad_unico <- ipeadatalake::read_cadunico( )
 
