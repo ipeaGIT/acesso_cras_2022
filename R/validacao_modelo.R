@@ -16,7 +16,7 @@ library(tidyr)
 library(maxcovr)
 
 
-###### Teste modelo otmizacao #####
+
 ##### Dados do modelo #####
 ### Populacao que precisa ser atendida
 
@@ -111,7 +111,10 @@ maxima_cobertura_lp <- function(n_facilities, existing_facilities, populacao, di
   # 1. Filtrar as distâncias que respeitam o corte de tempo
   distancia_filtrada <- distancia[distancia$travel_time_p50 <= corte_tempo, ]
   
-  # 2. Criar uma matriz binária onde cada linha representa um hexágono de usuário
+  # 2. Priorizar os hexágonos mais próximos para atendimento (ordenar por tempo de viagem)
+  distancia_filtrada <- distancia_filtrada[order(distancia_filtrada$travel_time_p50), ]
+  
+  # 3. Criar uma matriz binária onde cada linha representa um hexágono de usuário
   # e cada coluna representa um hexágono candidato a receber uma nova facility
   hexagonos <- unique(distancia_filtrada$to_id)  # Hexágonos de usuários
   candidatos <- unique(distancia_filtrada$from_id)  # Hexágonos candidatos a novas facilities
@@ -119,29 +122,55 @@ maxima_cobertura_lp <- function(n_facilities, existing_facilities, populacao, di
   n_hexagonos <- length(hexagonos)
   n_candidatos <- length(candidatos)
   
-  # 3. Construir a matriz de cobertura (binária)
+  # 4. Calcular a população que já foi atendida pelas facilities existentes
+  # Inicializar a população atendida com 0
+  populacao$atendida <- 0
+  
+  # Atribuir a cobertura existente
+  for (i in seq_len(nrow(existing_facilities))) {
+    facility_id <- existing_facilities$id_hex[i]
+    
+    # Hexágonos cobertos por essa facility
+    hexagonos_cobertos <- distancia_filtrada[distancia_filtrada$from_id == facility_id, ]
+    
+    # Atualizar a população atendida
+    if (nrow(hexagonos_cobertos) > 0) {
+      populacao$atendida[populacao$id_hex %in% hexagonos_cobertos$to_id] <- 
+        populacao$populacao[populacao$id_hex %in% hexagonos_cobertos$to_id]
+    }
+  }
+  
+  # 5. Calcular a população não atendida
+  populacao_nao_atendida <- populacao
+  populacao_nao_atendida$populacao <- populacao_nao_atendida$populacao - populacao_nao_atendida$atendida
+  populacao_nao_atendida$populacao[populacao_nao_atendida$populacao < 0] <- 0
+  
+  # 6. Construir a matriz de cobertura (binária) para a população não atendida
   matriz_cobertura <- matrix(0, nrow = n_hexagonos, ncol = n_candidatos)
+  
   for (i in 1:nrow(distancia_filtrada)) {
     from_idx <- which(candidatos == distancia_filtrada$from_id[i])
     to_idx <- which(hexagonos == distancia_filtrada$to_id[i])
-    matriz_cobertura[to_idx, from_idx] <- 1
+    if (length(from_idx) > 0 && length(to_idx) > 0) {
+      matriz_cobertura[to_idx, from_idx] <- 1
+    }
   }
   
-  # 4. Criar as variáveis de decisão binárias para cada candidato (1 se instalar a facility, 0 caso contrário)
-  variaveis_decisao <- rep(0, n_candidatos)
+  # 7. Criar a função objetivo: Maximizar a população coberta não atendida
+  populacao_ordenada <- populacao_nao_atendida[match(hexagonos, populacao_nao_atendida$id_hex), "populacao"]
+  populacao_ordenada[is.na(populacao_ordenada)] <- 0
   
-  # 5. Criar a função objetivo: Maximizar a população coberta
-  populacao_ordenada <- populacao[match(hexagonos, populacao$id_hex), "populacao"]
+  # A função objetivo é a soma ponderada da matriz de cobertura pela população não atendida
   funcao_objetivo <- colSums(matriz_cobertura * populacao_ordenada)
   
-  # 6. Restrições
+  # 8. Restrições
   # Restrição 1: Somente `n_facilities` facilities podem ser instaladas
   restricao_1 <- rep(1, n_candidatos)
   
   # Restrição 2: Cada hexágono de usuário só pode ser coberto por uma facility
   restricao_2 <- matriz_cobertura
   
-  # 7. Configurar o modelo com lpSolve
+  # 9. Configurar o modelo com lpSolve
   resultado <- lp(direction = "max", 
                   objective.in = funcao_objetivo, 
                   const.mat = rbind(restricao_1, restricao_2), 
@@ -149,11 +178,13 @@ maxima_cobertura_lp <- function(n_facilities, existing_facilities, populacao, di
                   const.rhs = c(n_facilities, rep(1, n_hexagonos)),
                   all.bin = TRUE)
   
-  # 8. Obter os hexágonos selecionados para instalar as novas facilities
+  # 10. Obter os hexágonos selecionados para instalar as novas facilities
   novas_facilities <- candidatos[which(resultado$solution == 1)]
   
   return(list(novas_facilities = novas_facilities, resultado = resultado))
 }
+
+
 
 
 #### Funcoes para resultado e geracao de mapa ####
@@ -365,4 +396,6 @@ gerar_mapa_facilities2 <- function(grid, populacao, cras, novas_facilities) {
 # Exemplo de uso:
 # Aqui, mc_result$facility_selected é passado como 'novas_facilities'
 gerar_mapa_facilities2(grid, populacao, cras, mc_result$facility_selected)
+
+
 
