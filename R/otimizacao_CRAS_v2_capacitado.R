@@ -41,8 +41,7 @@ populacao <- left_join(grid,df_geo_pop_h3, by = "id_hex") %>%
   st_drop_geometry
 
 ### Matriz tempo de viagem
-data_path <- system.file("extdata/poa", package = "r5r")
-r5r_core <- setup_r5(data_path)
+r5r_core <- setup_r5("L:/git_gregorio/acc_CRAS_cadUnico/data/poa_pbf")
 points <- grid %>%
   mutate(centroid = st_centroid(geom)) %>% 
   mutate(lat = st_coordinates(centroid)[,2], 
@@ -79,12 +78,9 @@ cras <- cras %>%
   mutate(capacidade = sample(4000:7000, n(), replace = TRUE))
 
 # Selecionar Candidatos
-candidatos <-  df_geo_pop_h3 %>%
-  sample_n(100) %>%
+candidatos <-  populacao %>%
+  #sample_n(100) %>%
   select(id_hex)
-
-
-
 
 
 ##### Definicao do modelo #####
