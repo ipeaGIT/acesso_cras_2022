@@ -95,6 +95,13 @@ processar_cras <- function(
            complete_address = paste(paste(q03,q04, sep = " "), q06, q09, q010, q08, sep = ", "),
            municipio = q09) %>%
     select(NU_IDENTIFICADOR, capacidade_familias, capacidade, complete_address, municipio) %>%
+    mutate(municipio = ifelse(municipio == "Brasília", "Brasilia",
+                              ifelse(municipio == "Belém", "Belem",
+                                     ifelse(municipio == "Goiânia", "Goiania",
+                                            ifelse(municipio == "Maceió", "Maceio",
+                                                   ifelse(municipio == "São Luís", "Sao Luis",
+                                                          ifelse(municipio == "São Paulo", "Sao Paulo",
+                                                                 ifelse(municipio == "São Gonçalo", "Sao Goncalo", municipio)))))))) %>%
     filter(municipio == cidade)
   
   
@@ -251,45 +258,130 @@ processar_cras <- function(
 }
 
 ######## Aplicação ##########
-porto_alegre <- processar_cras(
-  cidade = "Porto Alegre",
-  tempo_limite = 15,
+
+# Mapeamento de códigos IBGE
+cidades_ibge <- list(
+  "Belem" = 1501402,
+  "Belo Horizonte" = 3106200,
+  "Brasilia" = 5300108,
+  "Campinas" = 3509502,
+  "Campo Grande" = 5002704,
+  "Curitiba" = 4106902,
+  "Duque de Caxias" = 3301702,
+  "Fortaleza" = 2304400,
+  "Goiania" = 5208707,
+  "Guarulhos" = 3518800,
+  "Maceio" = 2704302,
+  "Manaus" = 1302603,
+  "Natal" = 2408102,
+  "Porto Alegre" = 4314902,
+  "Recife" = 2611606,
+  "Rio de Janeiro" = 3304557,
+  "Salvador" = 2927408,
+  "Sao Goncalo" = 3304904,
+  "Sao Luis" = 2111300,
+  "Sao Paulo" = 3550308
+)
+
+belem <- processar_cras(
+  cidade = "Belem",
+  tempo_limite = 30,
   capacidades = c(60000, 50000, 40000, 90000, 90000, 90000, 90000, 90000, 90000, 90000)
 )
 
 belo_horizonte <- processar_cras(
   cidade = "Belo Horizonte",
-  tempo_limite = 15,
+  tempo_limite = 30,
   capacidades = c(60000, 50000, 40000, 90000, 90000, 90000, 90000, 90000, 90000, 90000)
 )
 
-fortaleza <- processar_cras(
-  cidade = "Fortaleza",
-  tempo_limite = 15,
+brasilia <- processar_cras(
+  cidade = "Brasilia",
+  tempo_limite = 30,
   capacidades = c(60000, 50000, 40000, 90000, 90000, 90000, 90000, 90000, 90000, 90000)
 )
 
-rio_de_janeiro <- processar_cras(
-  cidade = "Rio de Janeiro",
-  tempo_limite = 15,
+campinas <- processar_cras(
+  cidade = "Campinas",
+  tempo_limite = 30,
+  capacidades = c(60000, 50000, 40000, 90000, 90000, 90000, 90000, 90000, 90000, 90000)
+)
+
+campo_grande <- processar_cras(
+  cidade = "Campo Grande",
+  tempo_limite = 30,
   capacidades = c(60000, 50000, 40000, 90000, 90000, 90000, 90000, 90000, 90000, 90000)
 )
 
 curitiba <- processar_cras(
   cidade = "Curitiba",
-  tempo_limite = 15,
+  tempo_limite = 30,
+  capacidades = c(60000, 50000, 40000, 90000, 90000, 90000, 90000, 90000, 90000, 90000)
+)
+
+fortaleza <- processar_cras(
+  cidade = "Fortaleza",
+  tempo_limite = 30,
+  capacidades = c(60000, 50000, 40000, 90000, 90000, 90000, 90000, 90000, 90000, 90000)
+)
+
+goiania <- processar_cras(
+  cidade = "Goiania",
+  tempo_limite = 30,
+  capacidades = c(60000, 50000, 40000, 90000, 90000, 90000, 90000, 90000, 90000, 90000)
+)
+
+maceio <- processar_cras(
+  cidade = "Maceio",
+  tempo_limite = 30,
+  capacidades = c(60000, 50000, 40000, 90000, 90000, 90000, 90000, 90000, 90000, 90000)
+)
+
+manaus <- processar_cras(
+  cidade = "Manaus",
+  tempo_limite = 30,
+  capacidades = c(60000, 50000, 40000, 90000, 90000, 90000, 90000, 90000, 90000, 90000)
+)
+
+natal <- processar_cras(
+  cidade = "Natal",
+  tempo_limite = 30,
+  capacidades = c(60000, 50000, 40000, 90000, 90000, 90000, 90000, 90000, 90000, 90000)
+)
+
+porto_alegre <- processar_cras(
+  cidade = "Porto Alegre",
+  tempo_limite = 30,
   capacidades = c(60000, 50000, 40000, 90000, 90000, 90000, 90000, 90000, 90000, 90000)
 )
 
 recife <- processar_cras(
   cidade = "Recife",
-  tempo_limite = 15,
+  tempo_limite = 30,
   capacidades = c(60000, 50000, 40000, 90000, 90000, 90000, 90000, 90000, 90000, 90000)
 )
 
-Salvador <- processar_cras(
+rio_de_janeiro <- processar_cras(
+  cidade = "Rio de Janeiro",
+  tempo_limite = 30,
+  capacidades = c(60000, 50000, 40000, 90000, 90000, 90000, 90000, 90000, 90000, 90000)
+)
+
+salvador <- processar_cras(
   cidade = "Salvador",
-  tempo_limite = 15,
+  tempo_limite = 30,
+  capacidades = c(60000, 50000, 40000, 90000, 90000, 90000, 90000, 90000, 90000, 90000)
+)
+
+sao_luis <- processar_cras(
+  cidade = "Sao Luis",
+  tempo_limite = 30,
+  capacidades = c(60000, 50000, 40000, 90000, 90000, 90000, 90000, 90000, 90000, 90000)
+)
+
+sao_paulo <- processar_cras(
+  cidade = "Sao Paulo",
+  tempo_limite = 30,
   capacidades = c(60000, 50000, 40000, 90000, 90000, 90000, 90000, 90000, 90000, 90000)
 )
 
@@ -337,14 +429,155 @@ processar_multiplos_cras <- function(...) {
   return(resultado_consolidado)
 }
 
-resultado_df <- processar_multiplos_cras(belo_horizonte,
+resultado_df <- processar_multiplos_cras(belem,
+                                         belo_horizonte,
+                                         brasilia,
+                                         campinas,
+                                         campo_grande,
                                          curitiba,
-                                         porto_alegre,
                                          fortaleza,
+                                         goiania,
+                                         maceio,
+                                         manaus,
+                                         natal,
+                                         porto_alegre,
                                          recife,
-                                         Salvador,
-                                         rio_de_janeiro)
+                                         rio_de_janeiro,
+                                         salvador,
+                                         sao_luis,
+                                         sao_paulo)
+
 
 # Exibir o dataframe consolidado
 print(resultado_df)
+
+colnames(resultado_df) <- c(
+  "Belém", "Belo Horizonte", "Brasília", "Campinas", "Campo Grande", "Curitiba",
+  "Fortaleza", "Goiânia", "Maceió", "Manaus", "Natal", "Porto Alegre", "Recife",
+  "Rio de Janeiro", "Salvador", "São Luís", "São Paulo"
+)
+
+# Transformar o dataframe para o formato longo
+resultados_long <- resultado_df %>%
+  mutate(num_cras = row_number()) %>%
+  pivot_longer(cols = -num_cras, names_to = "cidade", values_to = "pessoas_cobertas")
+
+# Criar o gráfico
+ggplot(resultados_long, aes(x = num_cras, y = pessoas_cobertas, color = cidade)) +
+  geom_line(size = 1) + 
+  geom_point(size = 2) +
+  labs(
+    title = "Cobertura de pessoas por número de CRAS",
+    x = "Número de CRAS",
+    y = "Número de pessoas cobertas",
+    color = "Cidade"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+
+
+generate_city_map <- function(resultado) {
+  # Pré-processamento dos dados
+  df_city <- resultado$df_city %>%
+    dplyr::rename(total_pessoas = populacao)
+  
+  cobertura_final <- resultado$cobertura_final
+  
+  df_city_2 <- left_join(df_city, cobertura_final, by = "id_hex") %>%
+    replace_na(list(tipo_cras = "nao_coberto")) %>%
+    dplyr::rename(status = tipo_cras) %>%
+    select(id_hex, total_pessoas, status)
+  
+  # Calcular os percentuais
+  total_pop <- sum(df_city_2$total_pessoas, na.rm = TRUE)
+  total_existente <- sum(df_city_2$total_pessoas[df_city_2$status == "existente"], na.rm = TRUE)
+  total_novo <- sum(df_city_2$total_pessoas[df_city_2$status == "novo"], na.rm = TRUE)
+  total_nao_coberto <- sum(df_city_2$total_pessoas[df_city_2$status == "nao_coberto"], na.rm = TRUE)
+  
+  perc_existente <- (total_existente / total_pop) * 100
+  perc_novo <- (total_novo / total_pop) * 100
+  perc_nao_coberto <- (total_nao_coberto / total_pop) * 100
+  
+  # Adicionar rótulos
+  df_city_2 <- df_city_2 %>%
+    mutate(status_label = case_when(
+      status == "existente" ~ sprintf("Acessível CRAS existente (%.2f%%)", perc_existente),
+      status == "novo" ~ sprintf("Acessível CRAS novo (%.2f%%)", perc_novo),
+      status == "nao_coberto" ~ sprintf("Não Acessível (%.2f%%)", perc_nao_coberto)
+    ))
+  
+  # Preparar dados para CRAS
+  cras_id <- cobertura_final %>%
+    select(id_cras) %>%
+    distinct()
+  
+  df_city_geom <- read_grid(resultado$cidade)
+  
+  cras <- df_city_geom %>%
+    filter(id_hex %in% cras_id$id_cras) %>%
+    st_centroid()
+  
+  # Gerar o mapa
+  city_map <- ggplot() +
+    geom_sf(data = df_city_2, fill = NA, color = 'gray') +
+    geom_sf(data = df_city_2, aes(fill = total_pessoas), color = NA) + 
+    geom_sf(data = cras, aes(color = "CRAS"), size = 1, alpha = 0.6, show.legend = TRUE) +
+    facet_wrap(. ~ status_label) +
+    scale_fill_viridis_c(option = "viridis",
+                         name = "Total de pessoas",
+                         guide = guide_colourbar(direction = "vertical", title.position = "top", title.hjust = 0.5)) +
+    scale_color_manual(values = c("CRAS" = "red"), name = NULL) +
+    theme_minimal() +
+    theme(
+      legend.position = "right",
+      legend.title = element_text(size = 10),
+      legend.text = element_text(size = 8),
+      plot.background = element_rect(fill = "white", color = 'white'),
+      plot.margin = unit(c(1, 1, 1, 1), "cm")
+    ) +
+    labs(title = paste("População cadastrada no Cadúnico a menos e a mais de", resultado$tempo_limite, 
+                       "minutos de caminhada de um CRAS"),
+         caption = "Fonte: Cadúnico e Acesso a Oportunidades, IPEA",
+         x = "Longitude",
+         y = "Latitude") +
+    annotation_scale(location = "br", width_hint = 0.5, pad_x = unit(0.5, "cm"), pad_y = unit(0.5, "cm"))
+  
+  # Salvar mapa
+  ggsave(city_map, filename = paste0('./figures/mapa_otimizacao_', resultado$cidade, '_', resultado$tempo_limite, 'min.png'),
+         width = 30, height = 24, units = 'cm', dpi = 200)
+  
+  return(city_map)
+
+}
+
+curitiba_3 <- processar_cras(
+  cidade = "Curitiba",
+  tempo_limite = 30,
+  capacidades = c(16500, 16500, 16500)
+)
+
+recife_3 <- processar_cras(
+  cidade = "Recife",
+  tempo_limite = 30,
+  capacidades = c(16500, 16500, 16500)
+)
+
+belo_horizonte_3 <- processar_cras(
+  cidade = "Belo Horizonte",
+  tempo_limite = 30,
+  capacidades = c(16500, 16500, 16500)
+)
+
+campinas_3 <- processar_cras(
+  cidade = "Campinas",
+  tempo_limite = 30,
+  capacidades = c(16500, 16500, 16500)
+)
+
+
+generate_city_map(curitiba_3)
+generate_city_map(recife_3)
+generate_city_map(belo_horizonte_3)
+generate_city_map(campinas_3)
 
